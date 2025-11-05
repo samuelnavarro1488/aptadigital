@@ -1,58 +1,36 @@
-
-st.set_page_config(page_title="Acta Digital", page_icon="📝")
-
-st.title("📝 Acta Digital")
-st.write("Aplicación básica de ejemplo creada con Streamlit.")
-
-with st.form("form_acta"):
-    titulo = st.text_input("Título del acta")
-    asistentes = st.text_area("Asistentes (uno por línea)")
-    acuerdos = st.text_area("Acuerdos tomados")
-    fecha = st.date_input("Fecha del acta")
-    enviar = st.form_submit_button("Generar acta")
-
-if enviar:
-    st.success("Acta generada correctamente:")
-    st.write(f"**Título:** {titulo}")
-    st.write(f"**Fecha:** {fecha}")
-    st.write("**Asistentes:**")
-    st.write(asistentes)
-    st.write("**Acuerdos:**")
-    st.write(acuerdos)
-
+# app.py
 import streamlit as st
 import hashlib, time, json
 
-st.set_page_config(page_title="Imports Demo", page_icon="🧩")
+st.set_page_config(page_title="Demo Hash + JSON", page_icon="🔐")
 
-st.title("🧩 Demo: streamlit + hashlib + time + json")
+st.title("Demo: hashlib + time + json en Streamlit (sin instalar nada local)")
+st.write("Esta app se ejecuta en la nube. Usa solo librerías estándar y Streamlit.")
 
-# --- hashlib: calcular hash SHA-256 de un texto ---
-st.subheader("🔐 hashlib (SHA-256)")
-texto = st.text_input("Escribe un texto para calcular su hash:")
-if texto:
-    sha256 = hashlib.sha256(texto.encode("utf-8")).hexdigest()
-    st.code(sha256, language="text")
+texto = st.text_input("Texto a hashear", "hola mundo")
+algoritmo = st.selectbox("Algoritmo", ["md5", "sha1", "sha256", "sha512"])
+espera = st.slider("Espera (segundos) con time.sleep()", 0, 3, 0)
 
-# --- time: mostrar hora actual (en el momento del render) ---
-st.subheader("⏱️ time (hora actual)")
-st.write("Epoch (segundos):", int(time.time()))
-st.write("Hora local:", time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+if st.button("Calcular"):
+    # Simular trabajo
+    if espera:
+        time.sleep(espera)
 
-# --- json: serializar un diccionario a JSON ---
-st.subheader("🧾 json (serialización)")
-datos = {
-    "texto": texto,
-    "hash_sha256": hashlib.sha256(texto.encode("utf-8")).hexdigest() if texto else None,
-    "timestamp": int(time.time())
-}
-st.write("Diccionario Python:")
-st.write(datos)
+    # Elegir hash
+    data = texto.encode("utf-8")
+    h = getattr(hashlib, algoritmo)(data).hexdigest()
 
-st.write("JSON (texto):")
-st.code(json.dumps(datos, ensure_ascii=False, indent=2), language="json")
+    resultado = {
+        "input": texto,
+        "algoritmo": algoritmo,
+        "hash": h,
+        "timestamp": int(time.time()),
+    }
 
-st.info("Tip: Recarga la página para actualizar la hora, o añade un st.button para refrescar.")
-streamlit run app.py
-
+    st.success("Listo")
+    st.write("**Hash:**", h)
+    st.write("**Timestamp:**", resultado["timestamp"])
+    st.subheader("JSON")
+    st.code(json.dumps(resultado, ensure_ascii=False, indent=2), language="json")
+streamlit
 
